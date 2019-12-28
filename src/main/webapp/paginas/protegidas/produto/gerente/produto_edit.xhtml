@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:o="http://omnifaces.org/ui"
+	xmlns:of="http://omnifaces.org/functions"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<ui:composition template="/WEB-INF/templates/__commonLayout.xhtml">
+	<ui:define name="metadata">
+		<f:metadata>
+			<o:viewParam name="produto" value="#{produtoEdit.produto}" />
+			<f:viewAction action="#{produtoEdit.init()}" />
+		</f:metadata>
+	</ui:define>
+
+	<ui:define name="title">
+		Produto create/edit
+	</ui:define>
+
+	<ui:define name="content">
+
+		<h:form id="formEdit">
+
+			<p:panelGrid columns="2" styleClass="ui-noborder">
+				<f:facet name="header">Produto</f:facet>
+
+				<p:outputLabel value="Id:" rendered="#{produtoEdit.edicaoDeProduto}" />
+				<p:outputLabel value="#{produtoEdit.produto.id}"
+					rendered="#{produtoEdit.edicaoDeProduto}" />
+
+				<p:outputLabel for="Nome" value="Nome :" />
+				<p:inputText id="Nome" value="#{produtoEdit.produto.nome}"
+					label="Nome" required="true" />
+
+				<p:outputLabel for="ValorUnit" value="Valor unit :" />
+				<p:inputText id="ValorUnit"
+					value="#{produtoEdit.produto.valorUnitario}" label="Nome"
+					required="true" />
+
+				<p:outputLabel value="Disponibilidade: " for="itDisponivel" />
+				<p:selectOneRadio id="itDisponivel"
+					value="#{produtoEdit.produto.disponivel}" required="true">
+					<f:selectItem itemLabel="Disponivel" itemValue="true" />
+					<f:selectItem itemLabel="Nao Disponivel" itemValue="false" />
+				</p:selectOneRadio>
+
+				<p:outputLabel value="Categoria: " for="menu" />
+
+				<!-- 				<p:selectOneMenu id="menu" -->
+				<!-- 					value="#{produtoEdit.produto.categorias}" label="tipo" -->
+				<!-- 					required="true" > -->
+				<!-- 					<f:selectItem itemLabel="Sem categoria" itemValue="#{null}" /> -->
+				<!-- 					<f:selectItems value="#{produtoEdit.categorias}" var="g" -->
+				<!-- 						itemLabel="#{g.nome}" itemValue="#{g}" /> -->
+				<!-- 				</p:selectOneMenu> -->
+
+
+				<p:selectCheckboxMenu id="menu"
+					value="#{produtoEdit.categorias}" label="Categorias"
+					multiple="true" filter="false" 
+					panelStyle="width:250px" required="true">
+					<f:selectItems value="#{produtoEdit.allCategorias}" var="g"
+						itemLabel="#{g}" itemValue="#{g}" />
+				</p:selectCheckboxMenu>
+
+
+				<p:panelGrid columns="2" styleClass="ui-noborder">
+					<p:commandButton id="botaoSubmeter"
+						action="#{produtoEdit.saveProduto()}" value="Submit"
+						update="@form" icon="fa fa-save" />
+					<p:button id="botaoCancelar" outcome="/paginas/protegidas/produto/index.xhtml"
+						value="Cancel" icon="fa fa-remove" />
+				</p:panelGrid>
+
+				<p:defaultCommand id="defaultCommandId"
+					target="formEdit:botaoSubmeter" />
+			</p:panelGrid>
+		</h:form>
+	</ui:define>
+
+</ui:composition>
+
+</html>

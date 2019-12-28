@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:o="http://omnifaces.org/ui"
+	xmlns:of="http://omnifaces.org/functions"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<ui:composition template="/WEB-INF/templates/__commonLayout.xhtml">
+	<ui:define name="metadata">
+		<f:metadata>
+			<o:viewParam name="pedido" value="#{pedidoEdit.pedido}" />
+			<o:viewParam name="mesa" value="#{pedidoEdit.mesa}" />
+			<f:viewAction action="#{pedidoEdit.init()}" />
+		</f:metadata>
+	</ui:define>
+
+	<ui:define name="title">
+		Pedido create/edit
+	</ui:define>
+
+	<ui:define name="content">
+
+		<h:form id="formEdit">
+
+			<p:panelGrid columns="2" styleClass="ui-noborder">
+				<f:facet name="header">Pedido</f:facet>
+
+				<p:outputLabel value="Id:" rendered="#{pedidoEdit.edicaoDePedido}" />
+				<p:outputLabel value="#{pedidoEdit.pedido.id}"
+					rendered="#{pedidoEdit.edicaoDePedido}" />
+
+				<p:outputLabel for="Local" value="Local :" />
+				<p:selectOneMenu id="Local" value="#{pedidoEdit.pedido.local}"
+					label="Local" required="true">
+					<f:selectItem itemLabel="Selecione" itemValue="#{null}" />
+					<f:selectItems value="#{pedidoEdit.locais}" var="g"
+						itemLabel="#{g.nome}" itemValue="#{g}" />
+
+					<p:ajax update=":formEdit" />
+				</p:selectOneMenu>
+
+				<p:outputLabel for="Mesa" value="Mesa :"
+					rendered="#{pedidoEdit.localIsMesa}" />
+				<p:selectOneMenu id="Mesa" value="#{pedidoEdit.pedido.mesa}"
+					label="Mesa" required="true" rendered="#{pedidoEdit.localIsMesa}">
+					<f:selectItem itemLabel="Selecione" itemValue="#{null}" />
+					<f:selectItems value="#{pedidoEdit.mesas}" var="g"
+						itemLabel="#{g.numero}" itemValue="#{g}" />
+				</p:selectOneMenu>
+
+				<p:outputLabel for="valorEntrega" value="Valor da entraga :"
+					rendered="#{pedidoEdit.localIsEntrega}" />
+				<p:inputText id="valorEntrega"
+					value="#{pedidoEdit.pedido.valorEntrega}" label="valor entrega"
+					required="true" rendered="#{pedidoEdit.localIsEntrega}">
+
+					<p:watermark for="valorEntrega" value="2" />
+
+				</p:inputText>
+
+				<p:outputLabel value="Pague:" for="itPague" />
+				<p:selectOneRadio id="itPague" value="#{pedidoEdit.pedido.pague}"
+					required="true">
+					<f:selectItem itemLabel="Pague" itemValue="true" />
+					<f:selectItem itemLabel="Nao Pague" itemValue="false" />
+				</p:selectOneRadio>
+
+				<p:outputLabel for="Cliente" value="Cliente :" />
+				<p:selectOneMenu id="Cliente" value="#{pedidoEdit.pedido.cliente}"
+					label="Cliente" required="#{pedidoEdit.localIsEntrega}">
+					<f:selectItem itemLabel="Selecione" itemValue="#{null}" />
+					<f:selectItems value="#{pedidoEdit.clientes}" var="g"
+						itemLabel="#{g.nome}" itemValue="#{g}" />
+					<p:ajax update=":formEdit:Endereco"
+						listener="#{pedidoEdit.loadEnderecos()}" />
+				</p:selectOneMenu>
+
+				<p:outputLabel for="Endereco" value="Endereco :"
+					rendered="#{pedidoEdit.localIsEntrega}" />
+				<p:selectOneMenu id="Endereco" value="#{pedidoEdit.pedido.endereco}"
+					label="Endereco" required="true"
+					rendered="#{pedidoEdit.localIsEntrega}"
+					disabled="#{!pedidoEdit.isClienteSelected()}">
+					<f:selectItem itemLabel="Selecione" itemValue="#{null}"
+						itemDisabled="true" />
+					<f:selectItems value="#{pedidoEdit.enderecos}" var="g"
+						itemLabel="#{g.apelidoLocal}" itemValue="#{g}" />
+				</p:selectOneMenu>
+
+				<p:outputLabel value="Finalizado:" for="itFinalizado" />
+				<p:selectOneRadio id="itFinalizado" value="#{pedidoEdit.pedido.finalizado}"
+					required="true">
+					<f:selectItem itemLabel="Finalizado" itemValue="true" />
+					<f:selectItem itemLabel="Nao Finalizado" itemValue="false" />
+				</p:selectOneRadio>
+
+				<p:outputLabel for="Itens" value="Itens :" />
+				<p:dataTable id="Itens" var="item"
+					value="#{pedidoEdit.pedido.items}"
+					emptyMessage="Nenhum registro encontrado." paginator="true"
+					paginatorAlwaysVisible="true" rows="5"
+					paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					rowsPerPageTemplate="5,10,15">
+					<p:column headerText="ID">
+						<h:outputText value="#{item.id}" />
+					</p:column>
+					<p:column headerText="Qtd">
+						<h:outputText value="#{item.quantidade}" />
+					</p:column>
+					<p:column headerText="idProduto">
+						<h:outputText value="#{item.produto.id}" />
+					</p:column>
+					<p:column headerText="NomeProduto">
+						<h:outputText value="#{item.produto.nome}" />
+					</p:column>
+					<p:column headerText="pra viagem">
+						<h:outputText value="#{item.viagem}" />
+					</p:column>
+					<p:column headerText="valor">
+						<h:outputText value="#{item.valor}" />
+					</p:column>
+					<p:column headerText="Operations" width="300"
+						rendered="#{menu.isFuncionarioInRole('GERENTE')}">
+						<p:button id="editItem"
+							outcome="/paginas/protegidas/item/gerente/item_edit.xhtml"
+							value="Edit Item...">
+							<f:param name="item" value="#{item.id}" />
+							<f:param name="pedido" value="#{item.pedido.id}" />
+						</p:button>
+						<p:tooltip id="toolTipEditItem" for="editItem"
+							value="Edit item..." position="top" />
+
+						<p:commandButton id="deleteItem" icon="fa fa-remove"
+							action="#{pedidoEdit.delete(item)}">
+							<p:confirm header="Confirmação!"
+								message="Do you want to delete '#{item.produto.nome} '? !!"
+								icon="fa fa-remove" />
+						</p:commandButton>
+						<p:tooltip id="toolTipDeleteItem" for="deleteItem" value="Delete"
+							position="top" />
+
+
+					</p:column>
+
+				</p:dataTable>
+
+				<p:outputLabel for="addItem"
+					value="Mais Itens ? o pedido sera salvo! " />
+				<p:commandButton id="addItem" action="#{pedidoEdit.addItem()}"
+					value="add Item..." update="@form">
+				</p:commandButton>
+
+				<p:panelGrid columns="2" styleClass="ui-noborder">
+					<p:commandButton id="botaoSubmeter"
+						action="#{pedidoEdit.savePedido()}" value="Submit" update="@form"
+						icon="fa fa-save" />
+					<p:button id="botaoCancelar" outcome="/paginas/protegidas/pedido/index.xhtml"
+						value="Cancel" icon="fa fa-remove" />
+				</p:panelGrid>
+
+				<p:defaultCommand id="defaultCommandId"
+					target="formEdit:botaoSubmeter" />
+			</p:panelGrid>
+		</h:form>
+	</ui:define>
+
+</ui:composition>
+
+</html>

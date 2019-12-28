@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:o="http://omnifaces.org/ui"
+	xmlns:of="http://omnifaces.org/functions"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<ui:composition template="/WEB-INF/templates/__commonLayout.xhtml">
+	<ui:define name="metadata">
+		<f:metadata>
+			<o:viewParam name="cliente" value="#{telefoneEdit.cliente}" />
+			<f:viewAction action="#{telefoneEdit.init()}" />
+		</f:metadata>
+	</ui:define>
+
+	<ui:define name="title">
+		Telefones create/edit
+	</ui:define>
+
+	<ui:define name="content">
+
+		<h:form id="formEdit">
+
+			<p:panelGrid columns="2" styleClass="ui-noborder">
+				<f:facet name="header">Telefone</f:facet>
+
+				<p:outputLabel value="Id:"
+					rendered="#{telefoneEdit.edicaoDeCliente}" />
+				<p:outputLabel value="#{telefoneEdit.cliente.id}"
+					rendered="#{telefoneEdit.edicaoDeCliente}" />
+
+				<p:outputLabel for="telefone" value="Novo Telefone :" />
+				<p:inputText id="telefone" value="#{telefoneEdit.telefone.numero}"
+					label="telefone" required="true" />
+
+
+				<p:panelGrid columns="2" styleClass="ui-noborder">
+					<p:commandButton id="botaoSubmeter"
+						action="#{telefoneEdit.saveCliente()}" value="Submit"
+						update="@form" icon="fa fa-save" />
+					<p:button id="botaoCancelar" outcome="/paginas/protegidas/cliente/index.xhtml"
+						value="Cancel" icon="fa fa-remove" />
+				</p:panelGrid>
+
+				<p:defaultCommand id="defaultCommandId"
+					target="formEdit:botaoSubmeter" />
+			</p:panelGrid>
+		</h:form>
+		<p:fieldset legend="Telefones">
+
+			<p:dataTable id="dataTableTelefones" var="tele"
+				value="#{telefoneEdit.cliente.telefones}"
+				emptyMessage="Nenhum registro encontrado." paginator="true"
+				paginatorAlwaysVisible="true" rows="5"
+				paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+				rowsPerPageTemplate="5,10,15">
+				<p:column headerText="ID">
+					<h:outputText value="#{tele.id}" />
+				</p:column>
+				<p:column headerText="Numero">
+					<h:outputText value="#{tele.numero}" />
+				</p:column>
+				<p:column headerText="Operations" width="300">
+
+					<p:commandButton id="deletetele" icon="fa fa-remove"
+						action="#{telefoneEdit.delete(tele)}">
+						<p:confirm header="Confirmação!"
+							message="Do you want to delete '#{tele.numero} '?  !!"
+							icon="fa fa-remove" />
+					</p:commandButton>
+					<p:tooltip id="toolTipDeletetele" for="deletetele" value="Delete"
+						position="top" />
+
+
+				</p:column>
+
+			</p:dataTable>
+		</p:fieldset>
+	</ui:define>
+
+</ui:composition>
+
+</html>

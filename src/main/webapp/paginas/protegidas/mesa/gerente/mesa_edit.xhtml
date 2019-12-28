@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:o="http://omnifaces.org/ui"
+	xmlns:of="http://omnifaces.org/functions"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<ui:composition template="/WEB-INF/templates/__commonLayout.xhtml">
+	<ui:define name="metadata">
+		<f:metadata>
+			<o:viewParam name="mesa" value="#{mesaEdit.mesa}" />
+			<f:viewAction action="#{mesaEdit.init()}" />
+		</f:metadata>
+	</ui:define>
+
+	<ui:define name="title">
+		Mesa create/edit
+	</ui:define>
+
+	<ui:define name="content">
+
+		<h:form id="formEdit">
+
+			<p:panelGrid columns="2" styleClass="ui-noborder">
+				<f:facet name="header">Mesa</f:facet>
+
+				<p:outputLabel value="Id:" rendered="#{mesaEdit.edicaoDeMesa}" />
+				<p:outputLabel value="#{mesaEdit.mesa.id}"
+					rendered="#{mesaEdit.edicaoDeMesa}" />
+
+				<p:outputLabel for="Numero" value="Numero :" />
+				<p:inputText id="Numero" value="#{mesaEdit.mesa.numero}" label="Numero"
+					required="true" />
+
+
+				<p:panelGrid columns="2" styleClass="ui-noborder">
+					<p:commandButton id="botaoSubmeter" action="#{mesaEdit.saveMesa()}"
+						value="Submit" update="@form" icon="fa fa-save" />
+					<p:button id="botaoCancelar" outcome="/paginas/protegidas/mesa/index.xhtml"
+						value="Cancel" icon="fa fa-remove" />
+				</p:panelGrid>
+
+				<p:defaultCommand id="defaultCommandId"
+					target="formEdit:botaoSubmeter" />
+			</p:panelGrid>
+		</h:form>
+	</ui:define>
+
+</ui:composition>
+
+</html>

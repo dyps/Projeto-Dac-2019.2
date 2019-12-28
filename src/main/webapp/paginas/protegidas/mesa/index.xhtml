@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<ui:composition template="/WEB-INF/templates/__commonLayout.xhtml">
+
+
+	<ui:define name="title">
+		Manage Mesas 
+	</ui:define>
+
+	<ui:define name="content">
+		<p:fieldset legend="Filtros">
+
+			<h:form id="formFilter">
+
+				<p:panelGrid columns="2" styleClass="ui-noborder">
+					<f:facet name="header">Mesas</f:facet>
+
+					<p:outputLabel value="Numero : " for="itNumeroFilter" />
+					<p:inputText id="itNumeroFilter"
+						value="#{manageMesa.mesaFilter.numero}" label="Nome"
+						style="width:350px" />
+
+					<p:outputLabel value="Valor Max: " for="itvalormaxFilter" />
+					<p:inputText id="itvalormaxFilter"
+						value="#{manageMesa.mesaFilter.valorTotalMax}" label="valormax"
+						style="width:350px" />
+
+					<p:outputLabel value="Valor Min: " for="itvalorminFilter" />
+					<p:inputText id="itvalorminFilter"
+						value="#{manageMesa.mesaFilter.valorTotalMin}" label="valormin"
+						style="width:350px" />
+
+
+					<p:commandButton id="btnFiltrarBotao" value="Search"
+						action="#{manageMesa.filtrar()}"
+						update=":formFilter :dataTableMesas" icon="fa fa-search" />
+					<p:commandButton id="btnLimparBotao" value="Clean"
+						action="#{manageMesa.limpar()}" update=":formFilter"
+						process="@this" icon="fa fa-remove">
+						<p:resetInput target=":formFilter" />
+					</p:commandButton>
+				</p:panelGrid>
+
+			</h:form>
+		</p:fieldset>
+		<p:fieldset legend="Resultado">
+
+			<p:dataTable id="dataTableMesas" var="mesa"
+				value="#{manageMesa.mesas}"
+				emptyMessage="Nenhum registro encontrado." paginator="true"
+				paginatorAlwaysVisible="true" rows="5"
+				paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+				rowsPerPageTemplate="5,10,15">
+				<p:column headerText="ID">
+					<h:outputText value="#{mesa.id}" />
+				</p:column>
+				<p:column headerText="Numero">
+					<h:outputText value="#{mesa.numero}" />
+				</p:column>
+				<p:column headerText="ValorTotal">
+					<h:outputText value="#{mesa.valorTotal}" />
+				</p:column>
+				<p:column headerText="Operations" width="300"
+					rendered="#{menu.isFuncionarioInRole('GERENTE')}">
+					<p:button id="verPedidos" outcome="/paginas/protegidas/pedido/index.xhtml"
+						value="Pedidos...">
+						<f:param name="mesa" value="#{mesa.id}" />
+					</p:button>
+					<p:tooltip id="toolTipVerPedidos" for="verPedidos"
+						value="Pedidos da mesa..." position="top" />
+						
+					<p:button id="addPedido" outcome="/paginas/protegidas/pedido/gerente/pedido_edit.xhtml"
+						value="addPedido...">
+						<f:param name="mesa" value="#{mesa.id}" />
+					</p:button>
+					<p:tooltip id="toolTipaddPedido" for="addPedido"
+						value="adicionar Pedido a mesa..." position="top" />
+
+					<p:button id="editMesa" outcome="gerente/mesa_edit.xhtml"
+						value="Edit Mesa...">
+						<f:param name="mesa" value="#{mesa.id}" />
+					</p:button>
+					<p:tooltip id="toolTipEditMesa" for="editMesa" value="Edit mesa..."
+						position="top" />
+
+					<p:commandButton id="deleteMesa" icon="fa fa-remove"
+						action="#{manageMesa.delete(mesa)}">
+						<p:confirm header="Confirmação!"
+							message="Do you want to delete '#{mesa.id} ' !!"
+							icon="fa fa-remove" />
+					</p:commandButton>
+					<p:tooltip id="toolTipDeleteMesa" for="deleteMesa" value="Delete"
+						position="top" />
+
+
+				</p:column>
+
+			</p:dataTable>
+		</p:fieldset>
+	</ui:define>
+
+</ui:composition>
+
+</html>

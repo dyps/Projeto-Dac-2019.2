@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:o="http://omnifaces.org/ui"
+	xmlns:of="http://omnifaces.org/functions"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<ui:composition template="/WEB-INF/templates/__commonLayout.xhtml">
+
+
+	<ui:define name="metadata">
+		<f:metadata>
+			<o:viewParam name="mesa" value="#{managePedido.mesa}" />
+			<f:viewAction action="#{managePedido.init()}" />
+		</f:metadata>
+	</ui:define>
+	<ui:define name="title">
+		Manage Pedidos 
+	</ui:define>
+
+	<ui:define name="content">
+		<p:fieldset legend="Filtros">
+
+			<h:form id="formFilter">
+
+				<p:panelGrid columns="2" styleClass="ui-noborder">
+					<f:facet name="header">Pedidos</f:facet>
+
+
+					<!-- 					<p:outputLabel value="pague" for="itPague" /> -->
+					<!-- 					<p:selectOneRadio id="itPague" -->
+					<!-- 						value="#{managePedido.pedidoFilter.pague}"> -->
+					<!-- 						<f:selectItem itemLabel="Tanto faz" itemValue="#{null}" /> -->
+					<!-- 						<f:selectItem itemLabel="Pague" itemValue="true" /> -->
+					<!-- 						<f:selectItem itemLabel="Nao Pague" itemValue="false" /> -->
+					<!-- 					</p:selectOneRadio> -->
+
+					<p:outputLabel value="pague" for="itPague" />
+					<p:selectOneRadio id="itPague"
+						value="#{managePedido.pedidoFilter.pague}">
+						<f:selectItem itemLabel="Tanto faz" itemValue="#{null}" />
+						<f:selectItem itemLabel="Pague" itemValue="true" />
+						<f:selectItem itemLabel="Nao Pague" itemValue="false" />
+					</p:selectOneRadio>
+
+					<p:outputLabel value="finalizado" for="itFinalizado" />
+					<p:selectOneRadio id="itFinalizado"
+						value="#{managePedido.pedidoFilter.finalizado}">
+						<f:selectItem itemLabel="Tanto faz" itemValue="#{null}" />
+						<f:selectItem itemLabel="Finalizado" itemValue="true" />
+						<f:selectItem itemLabel="Nao Finalizado" itemValue="false" />
+					</p:selectOneRadio>
+
+					<p:outputLabel value="Mesa" for="itMesa" />
+					<p:selectOneMenu id="itMesa"
+						value="#{managePedido.pedidoFilter.mesa}">
+						<f:selectItem itemLabel="Selecione" itemValue="#{null}" />
+						<f:selectItems value="#{managePedido.allMesas}" var="g"
+							itemLabel="#{g.numero}" itemValue="#{g}" />
+					</p:selectOneMenu>
+
+
+					<p:commandButton id="btnFiltrarBotao" value="Search"
+						action="#{managePedido.filtrar()}"
+						update=":formFilter :dataTablePedidos" icon="fa fa-search" />
+					<p:commandButton id="btnLimparBotao" value="Clean"
+						action="#{managePedido.limpar()}" update=":formFilter"
+						process="@this" icon="fa fa-remove">
+						<p:resetInput target=":formFilter" />
+					</p:commandButton>
+				</p:panelGrid>
+
+			</h:form>
+		</p:fieldset>
+		<p:fieldset legend="Resultado">
+
+			<p:dataTable id="dataTablePedidos" var="pedido"
+				value="#{managePedido.pedidos}"
+				emptyMessage="Nenhum registro encontrado." paginator="true"
+				paginatorAlwaysVisible="true" rows="5"
+				paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+				rowsPerPageTemplate="5,10,15">
+				<p:column headerText="ID">
+					<h:outputText value="#{pedido.id}" />
+				</p:column>
+				<p:column headerText="Detalhes" width="300">
+					<p:panelGrid columns="2">
+						<h:outputText value="Local :" />
+						<h:outputText value="#{pedido.local.nome}" />
+
+						<h:outputText value="DataPedido :" />
+						<h:outputText value="#{pedido.dataPedido}">
+							<ui:include src="/WEB-INF/templates/_convert_date.xhtml" />
+						</h:outputText>
+
+						<h:outputText value="DataEntregue :" />
+						<h:outputText value="#{pedido.dataEntregue}">
+							<ui:include src="/WEB-INF/templates/_convert_date.xhtml" />
+						</h:outputText>
+
+						<h:outputText value="Pague :" />
+						<h:outputText value="#{pedido.pague}" />
+
+						<h:outputText value="Finalizado :" />
+						<h:outputText value="#{pedido.finalizado}" />
+
+						<h:outputText value="Valor Entrega :" />
+						<h:outputText value="#{pedido.valorEntrega}" />
+
+						<h:outputText value="Valor Total :" />
+						<h:outputText value="#{pedido.valorTotal}" />
+
+						<h:outputText value="Nome Cliente:" />
+						<h:outputText value="#{pedido.cliente.nome}" />
+
+						<h:outputText value="Apelido Endereco:" />
+						<h:outputText value="#{pedido.endereco.apelidoLocal}" />
+
+						<h:outputText value="Numero Mesa :" />
+						<h:outputText value="#{pedido.mesa.numero}" />
+					</p:panelGrid>
+				</p:column>
+
+				<p:column headerText="Funcionarios">
+					<p:dataList value="#{pedido.funcionarios}" var="func"
+						type="ordered">
+						<f:facet name="header">
+        			    Funcionarios
+      				</f:facet>
+      				 #{func.nome}
+  				</p:dataList>
+				</p:column>
+
+				<p:column headerText="Itens" width="300">
+					<p:dataList value="#{pedido.items}" var="item">
+						<h:panelGrid columns="2">
+							<h:outputText value="ID" />
+							<h:outputText value="#{item.id}" />
+							<h:outputText value="Qtd" />
+							<h:outputText value="#{item.quantidade}" />
+
+							<h:outputText value="idProduto" />
+							<h:outputText value="#{item.produto.id}" />
+							<h:outputText value="NomeProduto" />
+							<h:outputText value="#{item.produto.nome}" />
+							<h:outputText value="pra viagem" />
+							<h:outputText value="#{item.viagem}" />
+							<h:outputText value="valor" />
+							<h:outputText value="#{item.valor}" />
+						</h:panelGrid>
+					</p:dataList>
+				</p:column>
+
+				<p:column headerText="Operations" width="300"
+					rendered="#{menu.isFuncionarioInRole('GERENTE')}">
+					<p:commandButton id="finalizarPedido" value="Finalizar"
+						action="#{managePedido.finalizar(pedido)}">
+					</p:commandButton>
+					<p:tooltip id="toolTipFinalizarPedido" for="finalizarPedido"
+						value="Finalizar" position="top" />
+
+					<p:commandButton id="entregarPedido" value="Entregar"
+						action="#{managePedido.entregar(pedido)}">
+					</p:commandButton>
+					<p:tooltip id="toolTipEntregarPedido" for="entregarPedido"
+						value="entregar" position="top" />
+
+
+
+
+					<p:button id="editPedido" outcome="gerente/pedido_edit.xhtml"
+						value="Edit Pedido...">
+						<f:param name="pedido" value="#{pedido.id}" />
+					</p:button>
+					<p:tooltip id="toolTipEditPedido" for="editPedido"
+						value="Edit pedido..." position="top" />
+
+					<p:commandButton id="deletePedido" icon="fa fa-remove"
+						action="#{managePedido.delete(pedido)}">
+						<p:confirm header="Confirmação!"
+							message="Do you want to delete '#{pedido.id} '? !!"
+							icon="fa fa-remove" />
+					</p:commandButton>
+					<p:tooltip id="toolTipDeletePedido" for="deletePedido"
+						value="Delete" position="top" />
+
+
+				</p:column>
+			</p:dataTable>
+		</p:fieldset>
+	</ui:define>
+
+</ui:composition>
+
+</html>

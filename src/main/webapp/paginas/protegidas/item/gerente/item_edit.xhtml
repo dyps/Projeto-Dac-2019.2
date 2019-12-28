@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:o="http://omnifaces.org/ui"
+	xmlns:of="http://omnifaces.org/functions"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<ui:composition template="/WEB-INF/templates/__commonLayout.xhtml">
+	<ui:define name="metadata">
+		<f:metadata>
+			<o:viewParam name="item" value="#{itemEdit.item}" />
+			<o:viewParam name="pedido" value="#{itemEdit.pedido}" />
+			<f:viewAction action="#{itemEdit.init()}" />
+		</f:metadata>
+	</ui:define>
+
+	<ui:define name="title">
+		Item create/edit
+	</ui:define>
+
+	<ui:define name="content">
+
+		<h:form id="formEdit">
+
+			<p:panelGrid columns="2" styleClass="ui-noborder">
+				<f:facet name="header">Item</f:facet>
+
+				<p:outputLabel value="Id:" rendered="#{itemEdit.edicaoDeItem}" />
+				<p:outputLabel value="#{itemEdit.item.id}"
+					rendered="#{itemEdit.edicaoDeItem}" />
+
+				<p:outputLabel for="Qtd" value="Qtd :" />
+				<p:inputText id="Qtd" value="#{itemEdit.item.quantidade}"
+					label="Qtd" required="true" />
+
+				<p:outputLabel for="Modificacao" value="Modificacao :" />
+				<p:inputTextarea id="Modificacao"
+					value="#{itemEdit.item.modificacao}" label="Modificacao" />
+
+				<p:outputLabel value="Viagem:" for="itViagem" />
+				<p:selectOneRadio id="itViagem" value="#{itemEdit.item.viagem}"
+					required="true">
+					<f:selectItem itemLabel="viagem" itemValue="true" />
+					<f:selectItem itemLabel="local" itemValue="false" />
+				</p:selectOneRadio>
+
+				<p:outputLabel value="Produto" for="itProduto" />
+				<p:selectOneMenu id="itProduto" value="#{itemEdit.item.produto}"
+					required="true">
+					<f:selectItem itemLabel="Selecione" itemValue="#{null}" />
+					<f:selectItems value="#{itemEdit.allProdutosDisponiveis}" var="g"
+						itemLabel="#{g.nome}" itemValue="#{g}" />
+				</p:selectOneMenu>
+
+				<p:panelGrid columns="2" styleClass="ui-noborder">
+					<p:commandButton id="botaoSubmeter" action="#{itemEdit.saveItem()}"
+						value="Submit" update="@form" icon="fa fa-save" />
+					<p:button id="botaoCancelar"
+						outcome="/paginas/protegidas/pedido/gerente/pedido_edit.xhtml" value="Cancel"
+						icon="fa fa-remove">
+						<f:param name="pedido" value="#{itemEdit.pedido.id}" />
+					</p:button>
+				</p:panelGrid>
+
+				<p:defaultCommand id="defaultCommandId"
+					target="formEdit:botaoSubmeter" />
+			</p:panelGrid>
+		</h:form>
+	</ui:define>
+
+</ui:composition>
+
+</html>

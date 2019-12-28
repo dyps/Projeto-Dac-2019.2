@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:o="http://omnifaces.org/ui"
+	xmlns:of="http://omnifaces.org/functions"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<ui:composition template="/WEB-INF/templates/__commonLayout.xhtml">
+	<ui:define name="metadata">
+		<f:metadata>
+			<o:viewParam name="cliente" value="#{enderecoEdit.cliente}" />
+			<f:viewAction action="#{enderecoEdit.init()}" />
+		</f:metadata>
+	</ui:define>
+
+	<ui:define name="title">
+		Enderecos create/edit
+	</ui:define>
+
+	<ui:define name="content">
+
+		<h:form id="formEdit">
+
+			<p:panelGrid columns="2" styleClass="ui-noborder">
+				<f:facet name="header">Endereco</f:facet>
+
+				<p:outputLabel value="Id:"
+					rendered="#{enderecoEdit.edicaoDeCliente}" />
+				<p:outputLabel value="#{enderecoEdit.cliente.id}"
+					rendered="#{enderecoEdit.edicaoDeCliente}" />
+
+				<p:outputLabel for="Endereco" value="Apelido :" />
+				<p:inputText id="Endereco" value="#{enderecoEdit.endereco.apelidoLocal}"
+					label="Endereco" required="true" />
+					
+				<p:outputLabel for="numero" value="Numero :" />
+				<p:inputText id="numero" value="#{enderecoEdit.endereco.numero}"
+					label="numero" required="true" />
+					
+				<p:outputLabel for="Rua" value="Rua :" />
+				<p:inputText id="Rua" value="#{enderecoEdit.endereco.rua}"
+					label="Rua" required="true" />
+					
+				<p:outputLabel for="com" value="Complemento :" />
+				<p:inputText id="com" value="#{enderecoEdit.endereco.complemento}"
+					label="com" required="false" />
+
+
+				<p:panelGrid columns="2" styleClass="ui-noborder">
+					<p:commandButton id="botaoSubmeter"
+						action="#{enderecoEdit.saveCliente()}" value="Submit"
+						update="@form" icon="fa fa-save" />
+					<p:button id="botaoCancelar" outcome="/paginas/protegidas/cliente/index.xhtml"
+						value="Cancel" icon="fa fa-remove" />
+				</p:panelGrid>
+
+				<p:defaultCommand id="defaultCommandId"
+					target="formEdit:botaoSubmeter" />
+			</p:panelGrid>
+		</h:form>
+		<p:fieldset legend="Enderecos">
+
+			<p:dataTable id="dataTableEnderecos" var="tele"
+				value="#{enderecoEdit.cliente.enderecos}"
+				emptyMessage="Nenhum registro encontrado." paginator="true"
+				paginatorAlwaysVisible="true" rows="5"
+				paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+				rowsPerPageTemplate="5,10,15">
+				<p:column headerText="ID">
+					<h:outputText value="#{tele.id}" />
+				</p:column>
+
+				<p:column headerText="Numero">
+					<h:outputText value="#{tele.apelidoLocal}" />
+				</p:column>
+				<p:column headerText="Numero">
+					<h:outputText value="#{tele.numero}" />
+				</p:column>
+				<p:column headerText="Numero">
+					<h:outputText value="#{tele.rua}" />
+				</p:column>
+				<p:column headerText="Numero">
+					<h:outputText value="#{tele.complemento}" />
+				</p:column>
+				<p:column headerText="Operations" width="300">
+
+					<p:commandButton id="deletetele" icon="fa fa-remove"
+						action="#{enderecoEdit.delete(tele)}">
+						<p:confirm header="Confirmação!"
+							message="Do you want to delete '#{tele.numero} '?  !!"
+							icon="fa fa-remove" />
+					</p:commandButton>
+					<p:tooltip id="toolTipDeletetele" for="deletetele" value="Delete"
+						position="top" />
+
+
+				</p:column>
+
+			</p:dataTable>
+		</p:fieldset>
+	</ui:define>
+
+</ui:composition>
+
+</html>

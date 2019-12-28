@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<ui:composition template="/WEB-INF/templates/__commonLayout.xhtml">
+
+	<ui:param name="renderAddFuncDialogMenu" value="true" />
+
+	<ui:define name="title">
+		Manage Funcionarios 
+	</ui:define>
+
+	<ui:define name="content">
+		<p:fieldset legend="Filtros">
+
+			<h:form id="formFilter">
+
+				<p:panelGrid columns="2" styleClass="ui-noborder">
+					<f:facet name="header">Funcionarios</f:facet>
+
+					<p:outputLabel value="Nome : " for="itNomeFilter" />
+					<p:inputText id="itNomeFilter"
+						value="#{manageFuncionario.funcionarioFilter.nome}" label="Nome"
+						style="width:350px" />
+
+					<p:outputLabel value="Login : " for="itLoginFilter" />
+					<p:inputText id="itLoginFilter"
+						value="#{manageFuncionario.funcionarioFilter.login}" label="Login"
+						style="width:350px" />
+
+					<p:outputLabel value="Tipo de funcionario :" for="Tipofuncionario" />
+					<p:selectOneMenu id="Tipofuncionario"
+						value="#{manageFuncionario.funcionarioFilter.tipoFuncionario}"
+						label="Tipofuncionario">
+						<f:selectItem itemLabel="Selecione" itemValue="#{null}" />
+						<f:selectItems value="#{manageFuncionario.tipoFuncionarios}"
+							var="g" itemLabel="#{g.getNome()}" itemValue="#{g}" />
+					</p:selectOneMenu>
+
+					<p:commandButton id="btnFiltrarBotao" value="Search"
+						action="#{manageFuncionario.filtrar()}"
+						update=":formFilter :dataTableFuncionarios" icon="fa fa-search" />
+					<p:commandButton id="btnLimparBotao" value="Clean"
+						action="#{manageFuncionario.limpar()}" update=":formFilter"
+						process="@this" icon="fa fa-remove">
+						<p:resetInput target=":formFilter" />
+					</p:commandButton>
+				</p:panelGrid>
+
+			</h:form>
+		</p:fieldset>
+		<p:fieldset legend="Resultado">
+
+			<p:dataTable id="dataTableFuncionarios" var="func"
+				value="#{manageFuncionario.funcionarios}"
+				emptyMessage="Nenhum registro encontrado." paginator="true"
+				paginatorAlwaysVisible="true" rows="5"
+				paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+				rowsPerPageTemplate="5,10,15">
+				<p:column headerText="ID">
+					<h:outputText value="#{func.id}" />
+				</p:column>
+				<p:column headerText="Login">
+					<h:outputText value="#{func.login}" />
+				</p:column>
+				<p:column headerText="Nome">
+					<h:outputText value="#{func.nome}" />
+				</p:column>
+				<p:column headerText="Tipo">
+					<h:outputText value="#{func.tipo}" />
+				</p:column>
+				<p:column headerText="Operations" width="300" rendered="#{menu.isFuncionarioInRole('GERENTE')}">
+					<p:button id="editFunc" outcome="gerente/func_edit.xhtml" value="Edit Func...">
+						<f:param name="func" value="#{func.id}" />
+					</p:button>
+					<p:tooltip id="toolTipEditFunc" for="editFunc" value="Edit func..." position="top"/>
+					
+					<p:button id="editFuncPassword" outcome="gerente/func_edit_password.xhtml" value="..." icon="fa fa-edit">
+						<f:param name="func" value="#{func.id}" />
+					</p:button>
+					<p:tooltip id="toolTipEditFuncPassword" for="editFuncPassword" value="Password..." position="top"/>
+					
+					<p:commandButton id="editFuncDialog" icon="fa fa-edit"
+						action="#{FuncionarioEdit.init()}"
+						oncomplete="if (!args.validationFailed) { PF('funcEditDialog').show() }" update=":funcEditDialogId">
+						<f:setPropertyActionListener value="#{func}" target="#{funcionarioEdit.funcionario}" />
+						<p:resetInput target="funcEditDialogId" />
+					</p:commandButton>
+					<p:tooltip id="toolTipEditFuncDialog" for="editFuncDialog" value="Funcionario" position="top"/>
+					
+					<p:commandButton id="editFuncPasswordDialog" icon="fa fa-edit"
+						oncomplete="if (!args.validationFailed) { PF('funcPasswordEditDialog').show() }" update=":funcPasswordEditDialogId">
+						<f:setPropertyActionListener value="#{func}" target="#{funcionarioEditPassword.funcionario}" />
+						<p:resetInput target=":funcPasswordEditDialogId" />
+					</p:commandButton>
+					<p:tooltip id="toolTipEditFuncPasswordDialog" for="editFuncPasswordDialog" value="Password" position="top"/>
+
+					<p:commandButton id="deleteFunc" icon="fa fa-remove" action="#{manageFuncionario.delete(func)}">
+						<p:confirm header="Confirmação!" message="Do you want to delete '#{func.nome} '?" icon="fa fa-remove" />
+					</p:commandButton>
+					<p:tooltip id="toolTipDeleteFunc" for="deleteFunc" value="Delete" position="top"/>
+
+					
+				</p:column>
+
+			</p:dataTable>
+		</p:fieldset>
+		
+		<p:dialog id="funcEditDialogId" widgetVar="funcEditDialog" header="Func edit" modal="true" dynamic="true" closeOnEscape="true">
+		
+			<!-- Observação quanto a diálogos e h:form: Todo diálogo deve ter seu próprio h:form. Lembrando que não deve haver nunca h:forms aninhados:
+				 Referência: https://stackoverflow.com/questions/18958729/pcommandbutton-action-doesnt-work-inside-pdialog -->
+			<h:form id="formEdit">
+		
+				<ui:include src="/WEB-INF/templates/_campos_edit_funcionario.xhtml" />			
+				
+				<p:panelGrid columns="2" styleClass="ui-noborder">
+					<p:commandButton id="botaoSubmeter" action="#{funcionarioEdit.saveFuncionario}" value="Submit" update="@form" oncomplete="if (!args.validationFailed) { PF('funcEditDialog').hide(); }" 
+						icon="fa fa-save" />
+					<p:commandButton id="botaoCancelar" value="Cancel" onclick="PF('funcEditDialog').hide();" icon="fa fa-remove"
+						process="@this" />
+				</p:panelGrid>
+				
+				<p:defaultCommand target="formEdit:botaoSubmeter" />
+		
+			</h:form>
+		
+		</p:dialog>
+		
+	    <p:dialog id="funcPasswordEditDialogId" widgetVar="funcPasswordEditDialog" header="Func password edit" modal="true" dynamic="true" closeOnEscape="true">
+	    
+			<!-- Observação quanto a diálogos e h:form: Todo diálogo deve ter seu próprio h:form. Lembrando que não deve haver nunca h:forms aninhados:
+				 Referência: https://stackoverflow.com/questions/18958729/pcommandbutton-action-doesnt-work-inside-pdialog -->
+			<h:form id="formEditPassword">
+		
+				<h:outputText value="Func: #{funcionarioEditPassword.funcionario.nome} " />
+				
+				<p:panelGrid columns="2" styleClass="ui-noborder">
+					<f:facet name="header">Password</f:facet>
+		
+					<p:outputLabel for="currentPassword" value="Current Password:" />
+					<p:password id="currentPassword" value="#{funcionarioEditPassword.confirmacaoPasswordAtual}" label="Current Password" required="true" />
+		
+					<p:outputLabel for="password" value="New Password:" />
+					<p:password id="password" value="#{funcionarioEditPassword.newPassword}" label="New Password" required="true" match="confirmPassword" feedback="true" />
+		
+					<p:outputLabel for="confirmPassword" value="Confirm Password:" />
+					<p:password id="confirmPassword" value="#{funcionarioEditPassword.newPassword}" label="Confirm Password" required="true" feedback="true" />
+		
+					<p:commandButton id="botaoSubmeterEditPassword" action="#{funcionarioEditPassword.changePassword}" value="Submit" update="@form" icon="fa fa-save"
+						oncomplete="if (!args.validationFailed) { PF('funcPasswordEditDialog').hide(); }"  />
+					<p:commandButton id="botaoCancelarEditPassword" onclick="PF('funcPasswordEditDialog').hide();" value="Cancel" icon="fa fa-remove"
+						process="@this" />
+				</p:panelGrid>
+			</h:form>
+	    
+	    </p:dialog>
+
+
+	</ui:define>
+
+</ui:composition>
+
+</html>

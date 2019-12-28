@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<ui:composition template="/WEB-INF/templates/__commonLayout.xhtml">
+
+
+	<ui:define name="title">
+		Manage Clientes 
+	</ui:define>
+
+	<ui:define name="content">
+		<p:fieldset legend="Filtros">
+
+			<h:form id="formFilter">
+
+				<p:panelGrid columns="2" styleClass="ui-noborder">
+					<f:facet name="header">Clientes</f:facet>
+
+					<p:outputLabel value="Nome : " for="itNomeFilter" />
+					<p:inputText id="itNomeFilter"
+						value="#{manageCliente.clienteFilter.nome}" label="Nome"
+						style="width:350px" />
+
+
+					<p:commandButton id="btnFiltrarBotao" value="Search"
+						action="#{manageCliente.filtrar()}"
+						update=":formFilter :dataTableClientes" icon="fa fa-search" />
+					<p:commandButton id="btnLimparBotao" value="Clean"
+						action="#{manageCliente.limpar()}" update=":formFilter"
+						process="@this" icon="fa fa-remove">
+						<p:resetInput target=":formFilter" />
+					</p:commandButton>
+				</p:panelGrid>
+
+			</h:form>
+		</p:fieldset>
+		<p:fieldset legend="Resultado">
+
+			<p:dataTable id="dataTableClientes" var="cliente"
+				value="#{manageCliente.clientes}"
+				emptyMessage="Nenhum registro encontrado." paginator="true"
+				paginatorAlwaysVisible="true" rows="5"
+				paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+				rowsPerPageTemplate="5,10,15">
+				<p:column headerText="ID">
+					<h:outputText value="#{cliente.id}" />
+				</p:column>
+				<p:column headerText="Nome">
+					<h:outputText value="#{cliente.nome}" />
+				</p:column>
+				<p:column headerText="Cpf">
+					<h:outputText value="#{cliente.CPF}" />
+				</p:column>
+				<p:column headerText="Operations" width="300"
+					rendered="#{menu.isFuncionarioInRole('GERENTE')}">
+
+					<p:button id="editTelefonesCliente"
+						outcome="gerente/cliente_edit_Telefones.xhtml"
+						value="Edit Telefones do Cliente...">
+						<f:param name="cliente" value="#{cliente.id}" />
+					</p:button>
+					<p:tooltip id="toolTipEditTelefonesCliente"
+						for="editTelefonesCliente" value="Edit Telefones do Cliente..."
+						position="top" />
+
+					<p:button id="editEnderecosCliente"
+						outcome="gerente/cliente_edit_Enderecos.xhtml"
+						value="Edit Enderecos do Cliente...">
+						<f:param name="cliente" value="#{cliente.id}" />
+					</p:button>
+					<p:tooltip id="toolTipEditEnderecosCliente"
+						for="editEnderecosCliente" value="Edit Enderecos do Cliente..."
+						position="top" />
+
+					<p:button id="editCliente" outcome="gerente/cliente_edit.xhtml"
+						value="Edit Cliente...">
+						<f:param name="cliente" value="#{cliente.id}" />
+					</p:button>
+					<p:tooltip id="toolTipEditCliente" for="editCliente"
+						value="Edit Cliente..." position="top" />
+
+					<p:commandButton id="deleteCliente" icon="fa fa-remove"
+						action="#{manageCliente.delete(cliente)}">
+						<p:confirm header="Confirmação!"
+							message="Do you want to delete '#{cliente.nome} '? !!"
+							icon="fa fa-remove" />
+					</p:commandButton>
+					<p:tooltip id="toolTipDeleteCliente" for="deleteCliente"
+						value="Delete" position="top" />
+
+
+				</p:column>
+
+			</p:dataTable>
+		</p:fieldset>
+	</ui:define>
+
+</ui:composition>
+
+</html>
